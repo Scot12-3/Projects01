@@ -1,0 +1,172 @@
+def calculate_hw_metrics():
+    print("Calculator Inputs")
+    num_employees = float(input("Number of employees earning H&W: "))
+    avg_hourly_wage = float(input("Average hourly wage ($): "))
+    hw_rate = float(input("Average Health & Welfare rate ($/hour): "))
+    avg_hours_per_pp = float(input("Average H&W eligible hours per pay period: "))
+    pct_company_benefits = float(input("What percentage of employees elect company paid benefits? (%): ")) / 100
+    pct_401k = float(input("What percentage of Employees participate in 401K? (%): ")) / 100
+    employer_401k_match = float(input("401K employer match percentage (%): ")) / 100
+    pct_cash_in_lieu = float(input("What percentage are paid cash-in-lieu? (%): ")) / 100
+    pct_additional_benefits = float(input("What percentage elect additional benefits(401k,HSA)for excess HW earnings? (%): ")) / 100
+    hours_managing = float(input("How many hours per payroll manually managing HW?: "))
+    error_rate = float(input("Error rate of manual calculation (%): ")) / 100
+    print ("\n=== Employer Paid Benefits(per employee) ===")
+    print("Please enter the average cost per employee for each benefit:")
+    print("-------------------------------------------------")
+    avg_medical = float(input("Average Medical Cost per employee ($): "))
+    avg_dental = float(input("Average Dental Cost per employee ($): "))
+    avg_vision = float(input("Average Vision Cost per employee ($): "))
+    avg_other_medical = float(input("Average Other Medical HW Plans per employee ($): "))
+    avg_life = float(input("Average Group Term Life per employee ($): "))
+    avg_match = float(input("Average Employee Match per employee ($): "))
+    print("\nPlease indicate which benefits are deducted:")
+    print("-------------------------------------------------")
+    medical_deducted = input("Is Medical deducted? (y/n): ").lower() == 'y'
+    dental_deducted = input("Is Dental deducted? (y/n): ").lower() == 'y'
+    vision_deducted = input("Is Vision deducted? (y/n): ").lower() == 'y'
+    other_deducted = input("Are Other Medical benefits deducted? (y/n): ").lower() == 'y'
+    life_deducted = input("Is Life Insurance deducted? (y/n): ").lower() == 'y'
+    k401_deducted = input("Is 401k Match deducted? (y/n): ").lower() == 'y'
+    print("\n=== Calculating Results ===")
+    # Calculate annual costs for each benefit
+    annual_medical = (avg_medical * num_employees * 52)* pct_company_benefits
+    annual_dental = (avg_dental * num_employees * 52) * pct_company_benefits
+    annual_vision = (avg_vision * num_employees * 52)* pct_company_benefits
+    annual_other_medical = (avg_other_medical * num_employees * 52 )* pct_company_benefits
+    annual_life = (avg_life* num_employees * 52) * pct_company_benefits
+    annual_401k = (avg_match * num_employees * 52) * pct_401k
+    admin_labor_cost = hours_managing * 52 * 50
+    captured_emp_benefit_cost = (annual_medical + annual_dental + annual_vision +
+                                 annual_other_medical + annual_life + annual_401k)
+    est_error_cost = error_rate * captured_emp_benefit_cost
+    annual_hw_earnings = num_employees * hw_rate * avg_hours_per_pp * 52
+    ss_savings = annual_hw_earnings * 0.062
+    medicare_savings = annual_hw_earnings * 0.0145
+    fica_savings = ss_savings + medicare_savings
+    HW_savings = admin_labor_cost + est_error_cost
+    deducted = medical_deducted or dental_deducted or vision_deducted or life_deducted or other_deducted or k401_deducted
+    captured_benefit_cost2 = (
+        (annual_medical if medical_deducted else 0) +
+        (annual_dental if dental_deducted else 0) +
+        (annual_vision if vision_deducted else 0) +
+        (annual_life if life_deducted else 0) +
+        (annual_other_medical if other_deducted else 0) +
+        (annual_401k if k401_deducted else 0)
+    )
+    total_savings = HW_savings + fica_savings + captured_benefit_cost2
+    total_benefits_per_employee = (avg_medical + avg_dental + avg_vision + 
+                                 avg_other_medical + avg_life + avg_match)
+    annual_hw_cash_in_lieu = (annual_hw_earnings - captured_benefit_cost2) * pct_cash_in_lieu
+    annual_hw_additional = (annual_hw_earnings - captured_benefit_cost2) - annual_hw_cash_in_lieu
+    # Results
+    print("\n=== Calculator Inputs ===")
+    print(f"How many employees earn H&W: {int(num_employees)}")
+    print(f"Average Hourly Wage: ${avg_hourly_wage:,.2f}")
+    print(f"Average H&W Rate/hour: ${hw_rate:,.2f}")
+    print(f"Average H&W Eligible Hours per Pay Period: {avg_hours_per_pp}")
+    print(f"What percentage of employees elect Company paid benefits: {pct_company_benefits * 100:.2f}%")
+    print(f"What percentage of Employees Participating in 401K: {pct_401k * 100:.2f}%")
+    print(f"401K Employer Match Percentage: {employer_401k_match * 100:.2f}%")
+    print(f"Percentage of Employees Paid Cash-in-Lieu: {pct_cash_in_lieu * 100:.2f}%")
+    print(f"Percentage of Employees Electing Additional Benefits: {pct_additional_benefits * 100:.2f}%")
+    print(f"How many hours per payroll manually managing HW: ${hours_managing:,.2f}")
+    print(f"Error Rate of Manual Calculation: {error_rate * 100:.2f}%")
+    print("\n=== Employer Paid Benefits ===")
+    print("\nWeekly Payroll Costs:")
+    print(f"Average Medical Cost per Employee: ${avg_medical:,.2f}")
+    print(f"Average Dental Cost per Employee: ${avg_dental:,.2f}")
+    print(f"Average Vision Cost per Employee: ${avg_vision:,.2f}")
+    print(f"Average Other Medical HW Plans per Employee: ${avg_other_medical:,.2f}")
+    print(f"Average Group Term Life per Employee: ${avg_life:,.2f}")
+    print(f"Average Employee Match per Employee: ${avg_match:,.2f}")
+    print("\n=== Results ===")
+    print(f"Total Employer Paid Benefits: ${total_benefits_per_employee:,.2f}")
+    print("-------------------------------------------------")
+    print("\nAre costs deducted?:")
+    print(f"Medical deducted from H&W earnings: {'Yes' if medical_deducted else 'No'}")
+    print(f"Dental deducted from H&W earnings: {'Yes' if dental_deducted else 'No'}")
+    print(f"Vision deducted from H&W earnings: {'Yes' if vision_deducted else 'No'}")
+    print(f"Life Insurance deducted from H&W earnings: {'Yes' if life_deducted else 'No'}")
+    print(f"Other Medical benefits deducted from H&W earnings: {'Yes' if other_deducted else 'No'}")
+    print(f"401k Match deducted from H&W earnings: {'Yes' if k401_deducted else 'No'}")
+
+    print(f"=== Annual Savings Results: ${total_savings:,.2f}")
+    
+    print("\n=== Manual HW Process ===")
+    print(f"Annual Health and Welfare Earnings: ${annual_hw_earnings:,.2f}")
+    print(f"Captured Employer Paid Benefit Cost: ${captured_benefit_cost2:,.2f}")
+    print(f"Annual HW Paid Cash in Lieu: ${annual_hw_cash_in_lieu:,.2f}")
+    print(f"Annual HW Additional Benefits (401k, HSA, etc): ${annual_hw_additional:,.2f}")
+    print(f"Medical Employer Cost: ${annual_medical if medical_deducted else 0:,.2f}")
+    print(f"Dental Employer Cost: ${annual_dental if dental_deducted else 0:,.2f}")
+    print(f"Vision Employer Cost: ${annual_vision if vision_deducted else 0:,.2f}")
+    print(f"Life Insurance Employer Cost: ${annual_life if life_deducted else 0:,.2f}")
+    print(f"Other Benefit Employer Cost: ${annual_other_medical if other_deducted else 0:,.2f}")
+    print(f"401k Match Employer Cost: ${annual_401k if k401_deducted else 0:,.2f}")
+    print(f"Captured Employer Paid Benefit Cost: ${captured_benefit_cost2:,.2f}")
+    
+    print("\n=== Humanic Payroll===")
+    print(f"Annual Health and Welfare Earnings: ${annual_hw_earnings:,.2f}")
+    print(f"Captured Employer Paid Benefit Cost: ${captured_emp_benefit_cost:,.2f}")
+    print(f"Annual HW Paid Cash in Lieu: No over or under payments to employees for HW earnings")
+    print(f"Annual HW Additional Benefits (401k, HSA, etc): Save on taxes when employees are able to choose to receive benefits instead of cash!")
+    print(f"Medical Employer Cost: ${annual_medical:,.2f}")
+    print(f"Dental Employer Cost: ${annual_dental:,.2f}")
+    print(f"Vision Employer Cost: ${annual_vision:,.2f}")
+    print(f"Life Insurance Employer Cost: ${annual_life:,.2f}")
+    print(f"Other Benefit Employer Cost: ${annual_other_medical:,.2f}")
+    print(f"401k Match Employer Cost: ${annual_401k:,.2f}")
+    print(f"Captured Employer Paid Benefit Cost: ${captured_emp_benefit_cost:,.2f}")
+    
+    print("=== Humanic Payroll Annual Cost Savings Breakdown ===")
+    print("\nCurrent Manual Costs:")
+    print("-------------------------------------------------")
+    print("=== New Benefit Costs Captured ===")
+    if deducted:
+        print(f"Medical Employer Cost: $0")
+        print(f"Dental Employer Cost: $0")
+        print(f"Vision Employer Cost: $0")
+        print(f"Life Insurance Employer Cost: $0")
+        print(f"Other Benefit Employer Cost: $0")
+        print(f"401k Match Employer Cost: $0")
+        print(f"Captured Employer Paid Benefit Cost: $0")
+    else:    
+        print("\n=== -New Benefit Costs- ===")
+        print(f"Medical Employer Cost: ${annual_medical:,.2f}")
+        print(f"Dental Employer Cost: ${annual_dental:,.2f}")
+        print(f"Vision Employer Cost: ${annual_vision:,.2f}")
+        print(f"Life Insurance Employer Cost: ${annual_life:,.2f}")
+        print(f"Other Benefit Employer Cost: ${annual_other_medical:,.2f}")
+        print(f"401k Match Employer Cost: ${annual_401k:,.2f}") 
+    print(f"New benefit cost captured: ${0 if deducted else captured_emp_benefit_cost:,.2f}")
+    print("---------------------------------------------------------")
+    
+    print("\n=== Humanic Automated Savings ===")
+    print(f"Medical Employer Cost: $0")
+    print(f"Dental Employer Cost: $0")
+    print(f"Vision Employer Cost: $0")
+    print(f"Life Insurance Employer Cost: $0")
+    print(f"Other Benefit Employer Cost: $0")
+    print(f"401k Match Employer Cost: $0")
+    print(f"Captured Employer Paid Benefit Cost: $0")
+    print("-------------------------------------------------")
+    print(f" Total: ${annual_hw_earnings:,.2f}")
+
+    print("\n=== Automating HW Calculation Savings===")
+    print(f"Admin Labor Cost: $({admin_labor_cost:,.2f})")
+    print(f"Estimated Manual Error Cost: $({est_error_cost:,.2f})")
+    print("-------------------------------------------------")
+    print(f"Total HW Savings: $({HW_savings:,.2f})")
+    
+
+    print("\n=== FICA Tax Savings(100%' additional benefits instead of Cash in Lieu) ===")
+    print(f"Potential employer Social Security Tax Savings: $({ss_savings:.2f})")
+    print(f"Potential employer Medicare Tax Savings: $({medicare_savings:.2f})")
+    print("-------------------------------------------------")
+    print(f"Total FICA Savings: $({fica_savings:,.2f})")
+    
+    print(f"=== Total HW Savings: $({total_savings:,.2f})")
+    print("-------------------------------------------------")
+if __name__ == "__main__":
+    calculate_hw_metrics()
